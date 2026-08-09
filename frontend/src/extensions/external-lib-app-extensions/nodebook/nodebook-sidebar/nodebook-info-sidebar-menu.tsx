@@ -11,7 +11,7 @@ import { DocumentSidebarMenuSelection } from '../../../../components/editor-page
 import buttonStyles from '../../../../components/editor-page/sidebar/sidebar-button/sidebar-button.module.scss'
 import { concatCssClasses } from '../../../../utils/concat-css-classes'
 import { useNodeBookStats } from './use-nodebook-stats'
-import { ScoreRing } from './score-ring'
+import { ScoreRing } from '@nodebook/react'
 import styles from './nodebook-info-sidebar.module.scss'
 import Link from 'next/link'
 import React, { Fragment, useCallback } from 'react'

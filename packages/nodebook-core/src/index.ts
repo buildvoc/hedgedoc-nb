@@ -91,3 +91,7 @@ export { resolveSpans, getSpanTooltip } from './text-analyzer/span-resolver'
 export { analyzeViaLlm, checkLlmStatus } from './text-analyzer/llm-client'
 export { analyzeWithFallback } from './text-analyzer/fallback-pipeline'
 export { analyzeWithKeywords } from './text-analyzer/category-rules'
+
+// Stats & scoring
+export { computeNodeBookScore, computeNodeBookStatsFromMarkdown } from './stats'
+export type { NodeBookScore, NodeBookStats, NodeBookStatsResult, ScoreCategory } from './stats'

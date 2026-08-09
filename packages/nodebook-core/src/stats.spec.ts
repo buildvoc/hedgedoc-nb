@@ -3,8 +3,8 @@
  *
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-import { computeNodeBookScore } from './compute-nodebook-score'
-import type { NodeBookStats } from './compute-nodebook-score'
+import { computeNodeBookScore } from '@nodebook/core'
+import type { NodeBookStats } from '@nodebook/core'
 
 function makeStats(overrides: Partial<NodeBookStats> = {}): NodeBookStats {
   return {
