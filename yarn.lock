@@ -18972,6 +18972,7 @@ __metadata:
   dependencies:
     "@codemirror/state": "npm:6.4.1"
     "@codemirror/view": "npm:6.34.3"
+    "@nodebook/core": "workspace:*"
     "@nodebook/dom": "workspace:*"
     esbuild: "npm:^0.25.12"
     obsidian: "npm:^1.13.1"
