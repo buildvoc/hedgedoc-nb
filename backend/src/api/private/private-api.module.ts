@@ -9,7 +9,6 @@ import { AliasModule } from '../../alias/alias.module';
 import { ApiTokenModule } from '../../api-token/api-token.module';
 import { AuthModule } from '../../auth/auth.module';
 import { ExploreModule } from '../../explore/explore.module';
-import { NodeBookModule } from '../../nodebook/nodebook.module';
 import { FrontendConfigModule } from '../../frontend-config/frontend-config.module';
 import { GroupsModule } from '../../groups/groups.module';
 import { MediaModule } from '../../media/media.module';
@@ -25,7 +24,6 @@ import { LdapController } from './auth/ldap/ldap.controller';
 import { LocalController } from './auth/local/local.controller';
 import { OidcController } from './auth/oidc/oidc.controller';
 import { ConfigController } from './config/config.controller';
-import { NodeBookController } from './nodebook/nodebook.controller';
 import { CsrfController } from './csrf/csrf.controller';
 import { ExploreController } from './explore/explore.controller';
 import { GroupsController } from './groups/groups.controller';
@@ -42,7 +40,6 @@ import { UsersController } from './users/users.controller';
     PermissionsModule,
     AliasModule,
     ExploreModule,
-    NodeBookModule,
     MediaModule,
     RevisionsModule,
     AuthModule,
@@ -65,7 +62,6 @@ import { UsersController } from './users/users.controller';
     LdapController,
     LocalController,
     OidcController,
-    NodeBookController,
   ],
 })
 export class PrivateApiModule {}

@@ -3,11 +3,38 @@
  *
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-import { Inject, Injectable } from '@nestjs/common';
-import fetch from 'node-fetch';
+// Standalone port of the HedgeDoc-fork NodeBookAnalyzeService: identical
+// logic, with NestJS dependency injection replaced by environment
+// configuration and console logging. Node >= 18 provides global fetch.
 
-import llmConfig, { type LlmConfig } from '../config/llm.config';
-import { ConsoleLoggerService } from '../logger/console-logger.service';
+export interface LlmConfig {
+  nlpServiceUrl: string | null;
+  apiUrl: string | null;
+  apiKey: string | null;
+  model: string;
+}
+
+export function llmConfigFromEnv(): LlmConfig {
+  return {
+    nlpServiceUrl: process.env.HD_NLP_SERVICE_URL ?? null,
+    apiUrl: process.env.HD_LLM_API_URL ?? null,
+    apiKey: process.env.HD_LLM_API_KEY ?? null,
+    model: process.env.HD_LLM_MODEL ?? 'claude-sonnet-4-20250514',
+  };
+}
+
+class ConsoleLoggerService {
+  private context = '';
+  setContext(context: string): void {
+    this.context = context;
+  }
+  log(message: string): void {
+    console.log(`[${this.context}] ${message}`);
+  }
+  error(message: string): void {
+    console.error(`[${this.context}] ${message}`);
+  }
+}
 
 export interface TextSpan {
   start: number;
@@ -206,13 +233,10 @@ interface NlpServiceResponse {
   elapsed_seconds: number;
 }
 
-@Injectable()
 export class NodeBookAnalyzeService {
-  constructor(
-    private readonly logger: ConsoleLoggerService,
-    @Inject(llmConfig.KEY)
-    private readonly config: LlmConfig,
-  ) {
+  private readonly logger = new ConsoleLoggerService();
+
+  constructor(private readonly config: LlmConfig = llmConfigFromEnv()) {
     this.logger.setContext(NodeBookAnalyzeService.name);
   }
 

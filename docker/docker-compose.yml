@@ -16,6 +16,22 @@ services:
   # nodeBook deterministic NLP microservice (spaCy). Built from the separate
   # github.com/gnowgi/nodebook-nlp repo; set NODEBOOK_NLP_PATH to its checkout
   # (defaults to a sibling clone of this repo). Reachable in-network at nlp:8000.
+  # Standalone nodeBook analyze service (text -> CNL): fronts the nlp service
+  # and the configured LLM API. Auth is enforced by Caddy (forward_auth against
+  # the backend session) -- the service itself is unauthenticated in-network.
+  analyze:
+    build:
+      context: ../apps/nodebook-analyze
+    image: nodebook-analyze:latest
+    environment:
+      - HD_NLP_SERVICE_URL=${HD_NLP_SERVICE_URL:-http://nlp:8000}
+      - HD_LLM_API_URL=${HD_LLM_API_URL:-}
+      - HD_LLM_API_KEY=${HD_LLM_API_KEY:-}
+      - HD_LLM_MODEL=${HD_LLM_MODEL:-claude-sonnet-4-20250514}
+    depends_on:
+      - nlp
+    restart: unless-stopped
+
   nlp:
     build:
       context: ${NODEBOOK_NLP_PATH:-../../nodebook-nlp}
