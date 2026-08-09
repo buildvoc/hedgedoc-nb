@@ -18860,6 +18860,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"nodebook-analyze@workspace:apps/nodebook-analyze":
+  version: 0.0.0-use.local
+  resolution: "nodebook-analyze@workspace:apps/nodebook-analyze"
+  dependencies:
+    esbuild: "npm:^0.25.12"
+    fastify: "npm:^4.28.1"
+    typescript: "npm:5.9.3"
+  languageName: unknown
+  linkType: soft
+
 "nopt@npm:^7.0.0":
   version: 7.2.0
   resolution: "nopt@npm:7.2.0"

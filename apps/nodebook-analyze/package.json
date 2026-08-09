@@ -1,0 +1,20 @@
+{
+  "name": "nodebook-analyze",
+  "version": "0.1.0",
+  "description": "Standalone nodeBook text-analysis service (NLP + LLM proxy), extracted from the HedgeDoc-fork backend",
+  "license": "AGPL-3.0-only",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "esbuild src/server.ts --bundle --platform=node --target=node20 --format=cjs --outfile=dist/server.cjs",
+    "start": "node dist/server.cjs",
+    "dev": "node --watch dist/server.cjs"
+  },
+  "dependencies": {
+    "fastify": "^4.28.1"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.12",
+    "typescript": "5.9.3"
+  }
+}

@@ -13,6 +13,17 @@ log {
 }
 
 reverse_proxy /realtime http://backend:3000
+# nodeBook analyze service: same paths the frontend always called, now served
+# by the standalone container. forward_auth asks the backend whether the
+# session cookie belongs to a logged-in user before proxying.
+handle /api/private/nodebook/* {
+	forward_auth http://backend:3000 {
+		uri /api/private/me
+	}
+	uri strip_prefix /api/private/nodebook
+	reverse_proxy http://analyze:8600
+}
+
 reverse_proxy /api/* http://backend:3000
 reverse_proxy /public/* http://backend:3000
 reverse_proxy /media/* http://backend:3000

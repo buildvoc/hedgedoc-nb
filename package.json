@@ -17,6 +17,7 @@
     "packages/nodebook-markdown-it",
     "apps/nodebook-app",
     "apps/logseq-nodebook",
+    "apps/nodebook-analyze",
     "apps/obsidian-nodebook"
   ],
   "scripts": {

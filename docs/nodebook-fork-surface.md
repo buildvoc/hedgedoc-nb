@@ -27,13 +27,16 @@ external-lib extensions (mermaid, katex, graphviz, …):
 Roadmap: propose `NodeBookAppExtension` upstream as the eleventh external-lib
 extension, built on the published packages.
 
-## 2. Analyze backend (extraction planned)
+## 2. Analyze service (extracted — no backend modifications remain)
 
-`backend/src/nodebook/` + `backend/src/api/private/nodebook/` +
-`llm.config.ts` + registrations in `app.module.ts` /
-`private-api.module.ts`. Stateless (no tables) — proxies the in-network NLP
-service. Roadmap: standalone service container; the frontend calls a
-configured URL.
+The text→CNL analyze feature now runs as the standalone
+`apps/nodebook-analyze` container (Fastify port of the former backend
+service). The frontend keeps calling `/api/private/nodebook/*`; Caddy
+enforces login via `forward_auth` against the backend's
+`/api/private/me` and proxies to `analyze:8600`. Env (`HD_NLP_SERVICE_URL`,
+`HD_LLM_API_URL`, `HD_LLM_API_KEY`, `HD_LLM_MODEL`) moves to the analyze
+container. The HedgeDoc backend carries **zero** fork modifications for
+nodeBook.
 
 ## 3. Generic fixes (offered upstream)
 
