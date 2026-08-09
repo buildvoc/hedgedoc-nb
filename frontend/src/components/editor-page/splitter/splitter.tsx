@@ -172,6 +172,7 @@ export const Splitter: React.FC<SplitterProps> = ({ additionalContainerClassName
           forceOpen={resizingInProgress}
           focusLeft={relativeSplitValue < SNAP_PERCENTAGE}
           focusRight={relativeSplitValue > 100 - SNAP_PERCENTAGE}
+          splitValue={adjustedRelativeSplitValue}
           dividerButtonsShift={dividerButtonsShift}
         />
       )}

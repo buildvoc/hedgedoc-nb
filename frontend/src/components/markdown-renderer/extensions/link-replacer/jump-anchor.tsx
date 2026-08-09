@@ -5,6 +5,8 @@
  */
 import type { AllHTMLAttributes } from 'react'
 import React, { useCallback } from 'react'
+import { useRendererToEditorCommunicator } from '../../../editor-page/render-context/renderer-to-editor-communicator-context-provider'
+import { CommunicationMessageType } from '../../../render-page/window-post-message-communicator/rendering-message'
 
 export interface JumpAnchorProps extends AllHTMLAttributes<HTMLAnchorElement> {
   jumpTargetId: string
@@ -18,19 +20,16 @@ export interface JumpAnchorProps extends AllHTMLAttributes<HTMLAnchorElement> {
  * @param props Additional props directly given to the link
  */
 export const JumpAnchor: React.FC<JumpAnchorProps> = ({ jumpTargetId, children, ...props }) => {
+  const iframeCommunicator = useRendererToEditorCommunicator()
   const jumpToTargetId = useCallback(
     (event: React.MouseEvent<HTMLElement, MouseEvent>): void => {
-      const intoViewElement = document.getElementById(jumpTargetId)
-      const scrollElement = document.querySelector('[data-scroll-element]')
-      if (!intoViewElement || !scrollElement) {
-        return
-      }
-      //It would be much easier to use scrollIntoView here but since the code mirror also uses smooth scroll and bugs like
-      // https://stackoverflow.com/a/63563437/13103995 exist, we must use scrollTo.
-      scrollElement.scrollTo({ behavior: 'smooth', top: intoViewElement.offsetTop })
+      iframeCommunicator.sendMessageToOtherSide({
+        type: CommunicationMessageType.SET_URL_HASH,
+        hash: jumpTargetId
+      })
       event.preventDefault()
     },
-    [jumpTargetId]
+    [iframeCommunicator, jumpTargetId]
   )
 
   return (

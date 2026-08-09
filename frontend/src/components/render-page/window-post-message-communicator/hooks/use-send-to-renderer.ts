@@ -21,8 +21,8 @@ export const useSendToRenderer = (
   const iframeCommunicator = useEditorToRendererCommunicator()
 
   useEffect(() => {
-    if (message && rendererReady) {
-      iframeCommunicator?.sendMessageToOtherSide(message)
+    if (message && rendererReady && iframeCommunicator.isCommunicationEnabled()) {
+      iframeCommunicator.sendMessageToOtherSide(message)
     }
   }, [iframeCommunicator, message, rendererReady])
 }
