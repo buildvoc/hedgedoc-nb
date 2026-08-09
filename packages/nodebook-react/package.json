@@ -1,6 +1,6 @@
 {
   "name": "@nodebook/react",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "nodeBook React components - graph visualization, schema display, CodeMirror language",
   "license": "AGPL-3.0-only",
   "author": "gnowgi and the nodeBook contributors",

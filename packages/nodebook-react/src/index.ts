@@ -25,3 +25,7 @@ export { default as cnlHljsLanguage } from './nodebook-hljs-language'
 
 // Compat types (useful for consumers)
 export type { CodeProps } from './compat/types'
+
+// Score ring (graph-richness indicator)
+export { ScoreRing } from './score-ring'
+export type { ScoreRingProps } from './score-ring'
