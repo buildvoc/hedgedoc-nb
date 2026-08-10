@@ -47,7 +47,7 @@ Attributes render inside the node under a divider - name, value, units in math-i
 
 Rendering into a container also attaches (both on by default):
 
-- **Toolbar** (top right): fit-to-view, layout picker, PNG export. Disable with `toolbar: false`.
+- **Toolbar** (top right): fit-to-view, layout picker, PNG and SVG export, and a full-screen toggle. Disable with `toolbar: false`.
 - **Inspector** (opens on node click): the node's name, role, description, adjective/quantifier, its visible attributes and relations, and — when the node has morphs — a **morph switcher** whose buttons re-render the graph in place. Disable with `inspector: false`.
 
 Nodes are draggable and the canvas pans/zooms by default (Cytoscape behavior). The UI follows the `theme` option and `handle.setTheme()`.
