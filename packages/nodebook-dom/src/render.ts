@@ -15,6 +15,26 @@ import {
 import type { CnlGraphData, CnlOperation, CnlParseError, InferredEdge, ParsedUserSchemas } from '@nodebook/core'
 import cytoscape from 'cytoscape'
 import type { Core, LayoutOptions } from 'cytoscape'
+
+// cytoscape-svg touches window/canvas at import time, so it must load lazily
+// (first SVG export) — mirroring the React component.
+let svgRendererRegistration: Promise<void> | null = null
+function ensureSvgRenderer(): Promise<void> {
+  svgRendererRegistration ??= import('cytoscape-svg')
+    .then((mod) => {
+      const ext = (mod as { default?: cytoscape.Ext }).default ?? (mod as unknown as cytoscape.Ext)
+      try {
+        cytoscape.use(ext)
+      } catch {
+        // already registered (multiple bundles on one page)
+      }
+    })
+    .catch((error) => {
+      svgRendererRegistration = null
+      throw error
+    })
+  return svgRendererRegistration
+}
 import {
   buildCytoscapeElements,
   buildInferredEdgeElements,
@@ -120,6 +140,10 @@ export interface NodeBookHandle {
   setTheme(theme: NodeBookTheme): void
   /** Re-run the layout, optionally with a different layout name. */
   relayout(layout?: NodeBookLayout): void
+  /** The current graph as an SVG document string (loads cytoscape-svg on first use). */
+  exportSvg(): Promise<string>
+  /** Toggle browser fullscreen on the graph container (no-op headless). */
+  toggleFullscreen(): void
   /** Tear down the Cytoscape instance and release the container. */
   destroy(): void
 }
@@ -483,6 +507,45 @@ export function renderNodeBook(
     }
   }
 
+  const exportSvg = async (): Promise<string> => {
+    await ensureSvgRenderer()
+    return (cy as unknown as { svg: (options: Record<string, unknown>) => string }).svg({
+      full: true,
+      scale: 1,
+      bg: backgroundColor(theme)
+    })
+  }
+
+  const downloadFile = (href: string, filename: string): void => {
+    if (!container) return
+    const link = container.ownerDocument.createElement('a')
+    link.href = href
+    link.download = filename
+    link.click()
+  }
+
+  const toggleFullscreen = (): void => {
+    if (headless || !container) return
+    const doc = container.ownerDocument
+    if (doc.fullscreenElement === container) {
+      void doc.exitFullscreen()
+    } else {
+      void container.requestFullscreen?.()
+    }
+  }
+
+  // Resize/fit when entering or leaving fullscreen (the ResizeObserver also
+  // fires, but an explicit fit gives a clean full-frame view immediately).
+  let fullscreenListener: (() => void) | null = null
+  if (!headless && container && typeof document !== 'undefined') {
+    fullscreenListener = () => {
+      cy.resize()
+      cy.fit(undefined, 24)
+      ui?.refreshToolbar()
+    }
+    container.ownerDocument.addEventListener('fullscreenchange', fullscreenListener)
+  }
+
   let ui: UiHandle | null = null
   const wantToolbar = options.toolbar ?? true
   const wantInspector = options.inspector ?? true
@@ -514,11 +577,22 @@ export function renderNodeBook(
       extraActions: options.toolbarActions,
       onExportPng: () => {
         const uri = cy.png({ full: true, scale: 2, bg: backgroundColor(theme) })
-        const link = container.ownerDocument.createElement('a')
-        link.href = uri
-        link.download = 'nodebook-graph.png'
-        link.click()
-      }
+        downloadFile(uri, 'nodebook-graph.png')
+      },
+      onExportSvg: () => {
+        void exportSvg()
+          .then((svg) => {
+            const blob = new Blob([svg], { type: 'image/svg+xml' })
+            const url = URL.createObjectURL(blob)
+            downloadFile(url, 'nodebook-graph.svg')
+            setTimeout(() => URL.revokeObjectURL(url), 30_000)
+          })
+          .catch((error) => console.error('@nodebook/dom: SVG export failed', error))
+      },
+      isFullscreenAvailable:
+        typeof document !== 'undefined' && document.fullscreenEnabled === true,
+      isFullscreen: () => container?.ownerDocument.fullscreenElement === container,
+      onToggleFullscreen: toggleFullscreen
     })
   }
 
@@ -549,7 +623,13 @@ export function renderNodeBook(
       ui?.setTheme(next)
     },
     relayout,
+    exportSvg,
+    toggleFullscreen,
     destroy(): void {
+      if (fullscreenListener && container) {
+        container.ownerDocument.removeEventListener('fullscreenchange', fullscreenListener)
+        fullscreenListener = null
+      }
       ui?.destroy()
       ui = null
       destroyed = true

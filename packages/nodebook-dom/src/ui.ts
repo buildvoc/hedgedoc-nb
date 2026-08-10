@@ -20,6 +20,12 @@ const UI_CSS = `
   box-sizing: border-box;
   overflow: hidden;
 }
+.nodebook-graph-container:fullscreen {
+  width: 100vw !important;
+  height: 100vh !important;
+  border-radius: 0;
+  border: none;
+}
 .nb-ui-toolbar {
   position: absolute; top: 8px; right: 8px; z-index: 10;
   display: flex; gap: 4px; align-items: center;
@@ -279,6 +285,10 @@ export interface ToolbarContext {
   onFit: () => void
   onRelayout: (layout: NodeBookLayoutName) => void
   onExportPng: () => void
+  onExportSvg?: () => void
+  isFullscreenAvailable?: boolean
+  isFullscreen?: () => boolean
+  onToggleFullscreen?: () => void
   /** Show a "Nest" toggle for containment view. */
   hasContainment?: boolean
   isContainmentActive?: () => boolean
@@ -353,6 +363,25 @@ export function buildToolbar(doc: Document, ctx: ToolbarContext): HTMLElement {
   png.addEventListener('click', () => ctx.onExportPng())
   bar.appendChild(png)
 
+  if (ctx.onExportSvg) {
+    const svg = doc.createElement('button')
+    svg.className = 'nb-ui-btn'
+    svg.textContent = 'SVG'
+    svg.title = 'Download as SVG'
+    svg.addEventListener('click', () => ctx.onExportSvg!())
+    bar.appendChild(svg)
+  }
+
+  if (ctx.isFullscreenAvailable && ctx.onToggleFullscreen) {
+    const active = ctx.isFullscreen?.() ?? false
+    const full = doc.createElement('button')
+    full.className = 'nb-ui-btn nb-ui-fullscreen' + (active ? ' nb-ui-active' : '')
+    full.textContent = active ? '🗗' : '⛶'
+    full.title = active ? 'Exit full screen' : 'Full screen'
+    full.addEventListener('click', () => ctx.onToggleFullscreen!())
+    bar.appendChild(full)
+  }
+
   for (const action of ctx.extraActions ?? []) {
     const btn = doc.createElement('button')
     btn.className = 'nb-ui-btn'
@@ -388,6 +417,10 @@ export interface AttachUiOptions {
   onFit: () => void
   onRelayout: (layout: NodeBookLayoutName) => void
   onExportPng: () => void
+  onExportSvg?: () => void
+  isFullscreenAvailable?: boolean
+  isFullscreen?: () => boolean
+  onToggleFullscreen?: () => void
   extraActions?: ToolbarAction[]
 }
 
@@ -435,6 +468,10 @@ export function attachUi(cy: Core, container: HTMLElement, options: AttachUiOpti
       onToggleInferred: options.onToggleInferred,
       hasSimulation: options.hasSimulation,
       onResetSimulation: options.onResetSimulation,
+      onExportSvg: options.onExportSvg,
+      isFullscreenAvailable: options.isFullscreenAvailable,
+      isFullscreen: options.isFullscreen,
+      onToggleFullscreen: options.onToggleFullscreen,
       extraActions: options.extraActions
     })
     isolateFromGraph(toolbarEl)
